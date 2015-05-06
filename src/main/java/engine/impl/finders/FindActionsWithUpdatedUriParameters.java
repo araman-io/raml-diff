@@ -7,9 +7,9 @@ import org.raml.model.Action;
 import engine.Finder;
 
 public class FindActionsWithUpdatedUriParameters extends AbstractFindActionsWithUpdatedParameters implements Finder {
-  
+
   public Set<String> getParameterKeySet(Action action) {
-    return action.getBaseUriParameters().keySet();
+    return action.getResource().getUriParameters().keySet();
   }
 
   @Override

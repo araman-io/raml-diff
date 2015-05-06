@@ -1,0 +1,92 @@
+#%RAML 0.8
+title: a sample book service specification
+version: v0.4
+baseUri: http://foobar.com/bookservice
+protocols: [HTTP, HTTPS]
+
+/books:
+  /search:
+    displayName: free text search for a book 
+    get:
+      description: free text search for a book
+      queryParameters:
+        q:
+          type: string
+          required: true
+      responses:
+        200:
+          body:
+            application/json:
+              example: |
+                {
+                  "results" : [ 
+                    {
+                    "id": "1",
+                    "name": "Product One",
+                    "description": "This is the full description of the product.",
+                    "url": "http://example.com",
+                    "image": "http://example.com/image.jpg",
+                    "thumbnailUrl": "http://example.com/image-thumb.jpg"
+                    }, 
+                    {                    {
+                    "id": "2",
+                    "name": "Product Two",
+                    "description": "This is the full description of the product.",
+                    "url": "http://example.com",
+                    "image": "http://example.com/image.jpg",
+                    "thumbnailUrl": "http://example.com/image-thumb.jpg"
+                    }
+                  ]
+                }
+  /{bookTitle}:
+    displayName: fetch book by title
+    get:
+      description: fetch book by title
+      queryParameters:
+        bookTitle:
+          type: string
+          required: true
+      responses:
+        200:
+          body:
+            application/json:
+              example: | 
+                {
+                  "id": "1",
+                  "name": "Product One",
+                  "description": "This is the full description of the product.",
+                  "url": "http://example.com",
+                  "image": "http://example.com/image.jpg",
+                  "thumbnailUrl": "http://example.com/image-thumb.jpg"
+                }
+    put:
+      description: updates a specific book
+      queryParameters:
+        bookTitle:
+          type: string
+          required: true
+      body:
+        application/json:
+          example: |
+            {
+              "id": "1",
+              "name": "Product One",
+              "description": "This is the full description of the product.",
+              "url": "http://example.com",
+              "image": "http://example.com/image.jpg",
+              "thumbnailUrl": "http://example.com/image-thumb.jpg"
+            }
+      responses:
+        200:
+          body:
+            application/json:
+    delete:
+      description: deletes the given book
+      queryParameters:
+        bookTitle:
+          type: string
+          required: true
+      responses:
+        200:
+          body:
+            application/json:

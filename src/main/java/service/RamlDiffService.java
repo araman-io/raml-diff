@@ -62,8 +62,17 @@ public class RamlDiffService {
   }
 
   public static void main(String[] args) throws Exception {
-    new RamlDiffService().diff("src/test/resources/gistfile2.raml",
-        "src/test/resources/gistfile1.raml");
+    new RamlDiffService().diff(
+        "src/test/resources/04-bookservice-addqueryparam.raml",   
+        "src/test/resources/01-bookservice.raml");
   }
 
 }
+
+/*
+"src/test/resources/05-bookservice-addbaseuriparam.raml",
+"src/test/resources/04-bookservice-addqueryparam.raml",
+"src/test/resources/03-bookservice-removedqueryparam.raml",
+"src/test/resources/02-bookservice-newaction.raml",          
+"src/test/resources/01-bookservice.raml"
+*/
