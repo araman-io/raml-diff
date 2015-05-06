@@ -75,7 +75,17 @@ public class FindActionsWithUpdatedQueryParamsTest extends MockHelper {
     List<ActionDiff> diff = finderUnderTest.diff(newActionMap, oldActionMap);
     assertEquals(0, diff.size());
   }
-  
+
+  @Test
+  public void actionWithNoModificationShouldReturnNoDiffEvents() {
+    addMapEntryWithQueryParamKeySet(newActionMap, ActionType.GET, "/foo",
+        getSetFrom(Arrays.asList("query", "offset", "sort")));
+    addMapEntryWithQueryParamKeySet(oldActionMap, ActionType.GET, "/foo",
+        getSetFrom(Arrays.asList("query", "offset", "sort")));
+
+    List<ActionDiff> diff = finderUnderTest.diff(newActionMap, oldActionMap);
+    assertEquals(0, diff.size());
+  }
   @Test
   public void shouldReturnOneNewAndOneDeleteDiffEvent() {
     addMapEntryWithQueryParamKeySet(newActionMap, ActionType.GET, "/foo",

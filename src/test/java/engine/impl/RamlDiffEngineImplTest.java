@@ -26,7 +26,8 @@ public class RamlDiffEngineImplTest extends MockHelper {
 
   Map<ActionId, Action> newActionMap = new HashMap<ActionId, Action>();
   Map<ActionId, Action> oldActionMap = new HashMap<ActionId, Action>();
-  List<Finder> EXPECTED_FINDER_ORDER = Arrays.asList(new FindNewActions(), new FindRemovedActions(), new FindActionsWithUpdatedQueryParameters());
+  List<Finder> EXPECTED_FINDER_ORDER = Arrays.asList(new FindNewActions(), new FindRemovedActions(),
+      new FindActionsWithUpdatedQueryParameters());
   private RamlDiffEngine ramlDiffEngine = new RamlDiffEngineImpl();
 
 
@@ -51,7 +52,7 @@ public class RamlDiffEngineImplTest extends MockHelper {
     List<ActionDiff> allDifferences = ramlDiffEngine.findDifferences(newActionMap, oldActionMap);
     assertEquals(1, filterByDiffType(allDifferences, DiffType.NEW).count());
   }
-  
+
   @Test
   public void shouldReport2DeletedAction() {
     List<ActionDiff> allDifferences = ramlDiffEngine.findDifferences(newActionMap, oldActionMap);
