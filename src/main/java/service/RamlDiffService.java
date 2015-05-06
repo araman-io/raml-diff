@@ -62,8 +62,8 @@ public class RamlDiffService {
   }
 
   public static void main(String[] args) throws Exception {
-    new RamlDiffService().diff("d:/gitrepo/raml-diff/src/test/resources/gistfile2.raml",
-        "d:/gitrepo/raml-diff/src/test/resources/gistfile1.raml");
+    new RamlDiffService().diff("src/test/resources/gistfile2.raml",
+        "src/test/resources/gistfile1.raml");
   }
 
 }
