@@ -21,5 +21,9 @@ public class ActionDiff {
   public Action getAction() {
     return action;
   }
-
+  
+  @Override
+  public String toString() {
+    return this.getAction() + " is " + this.getDiffType();
+  }
 }

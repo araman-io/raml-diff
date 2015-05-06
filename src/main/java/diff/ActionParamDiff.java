@@ -12,5 +12,11 @@ public class ActionParamDiff extends ActionDiff {
     super(diffType, action);
     this.parameters = parameters;
   }
+  
+  @Override
+  public String toString() {
+    return "Parameters " + parameters + " is " + this.getDiffType() + " in action " + this.getAction();
+  }
+
 
 }

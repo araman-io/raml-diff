@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -12,31 +13,34 @@ import org.raml.model.Raml;
 import org.raml.model.Resource;
 import org.raml.parser.visitor.RamlDocumentBuilder;
 
+import diff.ActionDiff;
 import diff.ActionId;
+import engine.RamlDiffEngine;
+import engine.impl.RamlDiffEngineImpl;
 
 public class RamlDiffService {
+
+  RamlDiffEngine diffEngine = new RamlDiffEngineImpl();
 
   public void diff(String later, String older) throws Exception {
 
     Collection<Resource> laterResources = getRamlResourcesFor(later);
     Collection<Resource> olderResources = getRamlResourcesFor(older);
 
-    System.out.println("number of resources in this document " + laterResources.size());
+    Map<ActionId, Action> mapOfNewActions = getRamlActionsFor(laterResources);
+    Map<ActionId, Action> mapOfOldActions = getRamlActionsFor(olderResources);
 
-    Map<ActionId, Action> laterActions = getRamlActionsFor(laterResources);
-    Map<ActionId, Action> olderActions = getRamlActionsFor(olderResources);
+    List<ActionDiff> allDifferences = diffEngine.findDifferences(mapOfNewActions, mapOfOldActions);
 
-    System.out.println(laterActions);
-    System.out.println(olderActions);
-
-    System.out.println("list of actions in this document " + laterActions.size());
-
+    allDifferences.forEach(diff -> {
+      System.out.println(diff.toString());
+    });
   }
 
   public Map<ActionId, Action> getRamlActionsFor(Collection<Resource> resources) {
     return resources.stream().flatMap(resource -> {
       return resource.getActions().values().stream();
-    }).limit(2).collect(Collectors.toMap(ActionIdService::getId, ActionIdService::getAction));
+    }).collect(Collectors.toMap(ActionIdService::getId, ActionIdService::getAction));
   }
 
   protected Collection<Resource> getRamlResourcesFor(String fileName) throws Exception {
@@ -58,8 +62,8 @@ public class RamlDiffService {
   }
 
   public static void main(String[] args) throws Exception {
-    new RamlDiffService().diff("d:/gitrepo/api-console/src/assets/examples/github.raml",
-        "d:/gitrepo/api-console/src/assets/examples/box.raml");
+    new RamlDiffService().diff("d:/gitrepo/raml-diff/src/test/resources/gistfile2.raml",
+        "d:/gitrepo/raml-diff/src/test/resources/gistfile1.raml");
   }
 
 }
