@@ -27,11 +27,26 @@ public class MockHelper {
     ActionId id = new ActionId(type, uri);
     map.put(id, mockActionWith(type, uri));
   }
-
+  
+ 
   protected Action mockActionWith(ActionType type, String uri) {
+	    Action actionMock = mock(Action.class, RETURNS_DEEP_STUBS);
+	    when(actionMock.getType()).thenReturn(type);
+	    when(actionMock.getResource().getUri()).thenReturn(uri);
+	    when(actionMock.toString()).thenCallRealMethod();
+	    return actionMock;
+	 }
+
+  protected void addMapEntryWithTraits(Map<ActionId, Action> map, ActionType type, String uri, List<String> traits) {
+	    ActionId id = new ActionId(type, uri);
+	    map.put(id, mockActionWithTraits(type, uri, traits));
+	  }
+
+  protected Action mockActionWithTraits(ActionType type, String uri,  List<String> traits) {
     Action actionMock = mock(Action.class, RETURNS_DEEP_STUBS);
     when(actionMock.getType()).thenReturn(type);
     when(actionMock.getResource().getUri()).thenReturn(uri);
+    when(actionMock.getIs()).thenReturn(traits);
     when(actionMock.toString()).thenCallRealMethod();
     return actionMock;
   }

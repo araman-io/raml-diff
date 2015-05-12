@@ -2,6 +2,7 @@ package engine.impl;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +20,7 @@ import engine.Finder;
 import engine.MockHelper;
 import engine.RamlDiffEngine;
 import engine.impl.finders.FindActionsWithUpdatedQueryParameters;
+import engine.impl.finders.FindActionsWithUpdatedTraits;
 import engine.impl.finders.FindNewActions;
 import engine.impl.finders.FindRemovedActions;
 
@@ -27,30 +29,40 @@ public class RamlDiffEngineImplTest extends MockHelper {
   Map<ActionId, Action> newActionMap = new HashMap<ActionId, Action>();
   Map<ActionId, Action> oldActionMap = new HashMap<ActionId, Action>();
   List<Finder> EXPECTED_FINDER_ORDER = Arrays.asList(new FindNewActions(), new FindRemovedActions(),
-      new FindActionsWithUpdatedQueryParameters());
+      new FindActionsWithUpdatedQueryParameters(), new FindActionsWithUpdatedTraits());
   private RamlDiffEngine ramlDiffEngine = new RamlDiffEngineImpl();
 
 
   @Before
   public void initTest() throws Exception {
-    addMapEntryWith(newActionMap, ActionType.GET, "/foo");
+    List<String> traits = new ArrayList<String>();
+    traits.add("historical");
+    
+/*    addMapEntryWith(newActionMap, ActionType.GET, "/foo");
     addMapEntryWith(newActionMap, ActionType.DELETE, "/foo");
 
     addMapEntryWith(oldActionMap, ActionType.GET, "/foo");
     addMapEntryWith(oldActionMap, ActionType.DELETE, "/foo/bar");
-    addMapEntryWith(oldActionMap, ActionType.PATCH, "/foo/bar");
+    addMapEntryWith(oldActionMap, ActionType.PATCH, "/foo/bar");*/
+    
+    addMapEntryWithTraits(newActionMap, ActionType.GET, "/foo", traits);
+    addMapEntryWithTraits(newActionMap, ActionType.DELETE, "/foo", null);
+
+    addMapEntryWithTraits(oldActionMap, ActionType.GET, "/foo", null);
+    addMapEntryWithTraits(oldActionMap, ActionType.DELETE, "/foo/bar", null);
+    addMapEntryWithTraits(oldActionMap, ActionType.PATCH, "/foo/bar", null);
   }
 
   @Test
   public void shouldReportOverallThreeActionDifferences() {
     List<ActionDiff> allDifferences = ramlDiffEngine.findDifferences(newActionMap, oldActionMap);
-    assertEquals(3, allDifferences.size());
+    assertEquals(4, allDifferences.size());
   }
 
   @Test
   public void shouldReportOneNewAction() {
     List<ActionDiff> allDifferences = ramlDiffEngine.findDifferences(newActionMap, oldActionMap);
-    assertEquals(1, filterByDiffType(allDifferences, DiffType.NEW).count());
+    assertEquals(2, filterByDiffType(allDifferences, DiffType.NEW).count());
   }
 
   @Test

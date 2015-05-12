@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.raml.model.Action;
 
@@ -21,7 +21,6 @@ public class FindActionsWithUpdatedTraits implements Finder{
 	/**
 	 * The method provides the list of ActionDiffs with New and/or Deleted Traits.
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<ActionDiff> diff(Map<ActionId, Action> newActions, Map<ActionId, Action> oldActions) {
 		List<ActionDiff> traitDifferenceDetails = null;
@@ -33,11 +32,21 @@ public class FindActionsWithUpdatedTraits implements Finder{
 				List<String> traitsInNewRamlFile = retrieveTraitDetails(newActions, actionId);
 				List<String> traitsInOldRamlFile = retrieveTraitDetails(oldActions, actionId);
 				
-				Collection<String> traitsAdded = CollectionUtils.subtract(traitsInNewRamlFile, traitsInOldRamlFile);
-				Collection<String> traitsDeleted = CollectionUtils.subtract(traitsInOldRamlFile, traitsInNewRamlFile);
-				
+				Collection<String> traitsAdded = null;
+				Collection<String> traitsDeleted = null;
+				if(CollectionUtils.isNotEmpty(traitsInNewRamlFile) && CollectionUtils.isNotEmpty(traitsInOldRamlFile)){
+					traitsAdded = CollectionUtils.subtract(traitsInNewRamlFile, traitsInOldRamlFile);
+					traitsDeleted = CollectionUtils.subtract(traitsInOldRamlFile, traitsInNewRamlFile);
+				}
+				if(CollectionUtils.isEmpty(traitsInNewRamlFile)){
+					traitsInNewRamlFile = new ArrayList<String>();
+					traitsDeleted = CollectionUtils.subtract(traitsInOldRamlFile, traitsInNewRamlFile);
+				}
+				if(CollectionUtils.isEmpty(traitsInOldRamlFile)){
+					traitsInOldRamlFile = new ArrayList<String>();
+					traitsAdded = CollectionUtils.subtract(traitsInNewRamlFile, traitsInOldRamlFile);
+				}
 				List<ActionDiff> traitDetails = new ArrayList<ActionDiff>();
-				
 				if(traitsAdded != null && traitsAdded.size() > 0){
 					traitDetails.add(new TraitDiff(DiffType.NEW, commonAction, traitsAdded));
 				}
@@ -45,6 +54,7 @@ public class FindActionsWithUpdatedTraits implements Finder{
 				if(traitsDeleted != null && traitsDeleted.size() > 0){
 					traitDetails.add(new TraitDiff(DiffType.DELETED, commonAction, traitsDeleted));
 				}
+				
 				return traitDetails.stream();
 			}).collect(Collectors.toList());
 		}		
