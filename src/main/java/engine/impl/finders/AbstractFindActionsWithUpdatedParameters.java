@@ -31,7 +31,7 @@ public abstract class AbstractFindActionsWithUpdatedParameters implements Finder
       Collection<String> deletedParams = CollectionUtils.subtract(oldQueryParams, newQueryParams);
 
       List<ActionDiff> diffEvents = new ArrayList<ActionDiff>();
-      if ( newParams.size() > 0 ) {
+      if (newParams.size() > 0 ) {
         diffEvents.add(new ActionParamDiff(DiffType.NEW, theAction, newParams));
       }
       

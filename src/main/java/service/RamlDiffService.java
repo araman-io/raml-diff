@@ -45,7 +45,8 @@ public class RamlDiffService {
 
   protected Collection<Resource> getRamlResourcesFor(String fileName) throws Exception {
     FileReader fileReader = new FileReader(new File(fileName));
-    Raml document = new RamlDocumentBuilder().build(fileReader);
+    @SuppressWarnings("deprecation")
+	Raml document = new RamlDocumentBuilder().build(fileReader);
     Collection<Resource> allResources = this.flattenResources(document.getResources().values());
     return allResources;
   }
@@ -61,11 +62,18 @@ public class RamlDiffService {
     return nested;
   }
 
-  public static void main(String[] args) throws Exception {
+  /*public static void main(String[] args) throws Exception {
     new RamlDiffService().diff(
         "src/test/resources/04-bookservice-addqueryparam.raml",   
         "src/test/resources/01-bookservice.raml");
-  }
+  }*/
+  
+  public static void main(String[] args) throws Exception {
+	    new RamlDiffService().diff(
+	    	"src/test/resources/complete_raml.raml",
+	    	"src/test/resources/ complete_raml_with_one_parameter_added_to_historical_trait.raml"
+	        );
+	  }
 
 }
 
