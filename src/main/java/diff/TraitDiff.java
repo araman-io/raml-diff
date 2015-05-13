@@ -15,7 +15,7 @@ public class TraitDiff extends ActionDiff {
 	
 	@Override
 	  public String toString() {
-	    return "Trait "+traits+" is " + this.getDiffType() + " in action " + this.getAction();
+	    return "Trait "+traits+" is " + this.getDiffType() + " in " + this.getAction();
 	  }
 
 }

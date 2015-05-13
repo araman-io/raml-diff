@@ -12,6 +12,7 @@ import diff.ActionId;
 import engine.Finder;
 import engine.RamlDiffEngine;
 import engine.impl.finders.FindActionsWithUpdatedQueryParameters;
+import engine.impl.finders.FindActionsWithUpdatedResponses;
 import engine.impl.finders.FindActionsWithUpdatedTraits;
 import engine.impl.finders.FindNewActions;
 import engine.impl.finders.FindRemovedActions;
@@ -22,7 +23,8 @@ public class RamlDiffEngineImpl implements RamlDiffEngine {
       new FindNewActions(), 
       new FindRemovedActions(),
       new FindActionsWithUpdatedQueryParameters(),
-      new FindActionsWithUpdatedTraits());
+      new FindActionsWithUpdatedTraits(),
+      new FindActionsWithUpdatedResponses());
 
   public List<ActionDiff> findDifferences(Map<ActionId, Action> newActions, Map<ActionId, Action> oldActions) {
 
