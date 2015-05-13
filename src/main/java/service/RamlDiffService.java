@@ -69,9 +69,8 @@ public class RamlDiffService {
   }*/
   
   public static void main(String[] args) throws Exception {
-	    new RamlDiffService().diff(
-	    	"src/test/resources/complete_raml.raml",
-	    	"src/test/resources/ complete_raml_with_one_parameter_added_to_historical_trait.raml"
+	    new RamlDiffService().diff(	"src/test/resources/complete_raml.raml",    	
+	    	"src/test/resources/complete_raml_all_historical_trait_removed.raml"
 	        );
 	  }
 
