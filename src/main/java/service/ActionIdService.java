@@ -7,7 +7,7 @@ import diff.ActionId;
 public class ActionIdService {
 
   public static ActionId getId(Action action) {
-    ActionId id = new ActionId(action.getType(), action.getResource().getRelativeUri());
+    ActionId id = new ActionId(action.getType(), action.getResource().getUri());
     return id;
   }
 
