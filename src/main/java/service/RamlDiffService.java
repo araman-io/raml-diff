@@ -37,7 +37,7 @@ public class RamlDiffService {
     });
   }
 
-  public Map<ActionId, Action> getRamlActionsFor(Collection<Resource> resources) {
+  protected Map<ActionId, Action> getRamlActionsFor(Collection<Resource> resources) {
     return resources.stream().flatMap(resource -> {
       return resource.getActions().values().stream();
     }).collect(Collectors.toMap(ActionIdService::getId, ActionIdService::getAction));
