@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.raml.model.Action;
 
 import diff.ActionDiff;
@@ -16,55 +15,39 @@ import diff.DiffType;
 import diff.TraitDiff;
 import engine.Finder;
 
+/**
+ * Find actions with New and/or Deleted Traits.
+ */
 public class FindActionsWithUpdatedTraits implements Finder {
 
-  /**
-   * The method provides the list of ActionDiffs with New and/or Deleted Traits.
-   */
   @Override
   public List<ActionDiff> diff(Map<ActionId, Action> newActions, Map<ActionId, Action> oldActions) {
-    List<ActionDiff> traitDifferenceDetails = null;
-    if (MapUtils.isNotEmpty(newActions) && MapUtils.isNotEmpty(oldActions)) {
+    List<ActionDiff> traitDifferences = null;
 
-      Collection<ActionId> commonActionIds = CollectionUtils.intersection(newActions.keySet(), oldActions.keySet());
+    Collection<ActionId> commonActionIds = CollectionUtils.intersection(newActions.keySet(), oldActions.keySet());
 
-      traitDifferenceDetails = commonActionIds.stream().flatMap(actionId -> {
-        Action commonAction = newActions.get(actionId);
-        List<String> traitsInNewRamlFile = retrieveTraitDetails(newActions, actionId);
-        List<String> traitsInOldRamlFile = retrieveTraitDetails(oldActions, actionId);
+    traitDifferences = commonActionIds.stream().flatMap(actionId -> {
+      Action commonAction = newActions.get(actionId);
+      List<String> traitsInNewRamlFile = commonAction.getIs();
+      List<String> traitsInOldRamlFile = oldActions.get(actionId).getIs();
 
-        Collection<String> traitsAdded = CollectionUtils.subtract(traitsInNewRamlFile, traitsInOldRamlFile);
-        Collection<String> traitsDeleted = CollectionUtils.subtract(traitsInOldRamlFile, traitsInNewRamlFile);
+      Collection<String> traitsAdded = CollectionUtils.subtract(traitsInNewRamlFile, traitsInOldRamlFile);
+      Collection<String> traitsDeleted = CollectionUtils.subtract(traitsInOldRamlFile, traitsInNewRamlFile);
 
-        List<ActionDiff> traitDetails = new ArrayList<ActionDiff>();
-        if (CollectionUtils.isNotEmpty(traitsAdded)) {
-          traitDetails.add(new TraitDiff(DiffType.NEW, commonAction, traitsAdded));
-        }
+      List<ActionDiff> traitDetails = new ArrayList<ActionDiff>();
+      if (CollectionUtils.isNotEmpty(traitsAdded)) {
+        traitDetails.add(new TraitDiff(DiffType.NEW, commonAction, traitsAdded));
+      }
 
-        if (CollectionUtils.isNotEmpty(traitsDeleted)) {
-          traitDetails.add(new TraitDiff(DiffType.DELETED, commonAction, traitsDeleted));
-        }
+      if (CollectionUtils.isNotEmpty(traitsDeleted)) {
+        traitDetails.add(new TraitDiff(DiffType.DELETED, commonAction, traitsDeleted));
+      }
 
-        return traitDetails.stream();
-      }).collect(Collectors.toList());
-    }
-    return traitDifferenceDetails;
-  }
+      return traitDetails.stream();
 
-  /**
-   * The method retrieves the Traits from Action.
-   * 
-   * @param Map<ActionId, Action>
-   * @param ActionId
-   * @return List<String>
-   */
-  protected List<String> retrieveTraitDetails(Map<ActionId, Action> actions, ActionId actionId) {
-    List<String> traitDetails = null;
-    Action action = actions.get(actionId);
-    if (action != null) {
-      traitDetails = action.getIs();
-    }
-    return traitDetails;
+    }).collect(Collectors.toList());
+
+    return traitDifferences;
   }
 
   public boolean equals(Object o) {
