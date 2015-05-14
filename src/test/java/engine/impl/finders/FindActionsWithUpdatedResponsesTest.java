@@ -42,22 +42,4 @@ public class FindActionsWithUpdatedResponsesTest extends MockHelper {
     assertEquals(0, classToTest.diff(oldActions, oldActions).size());
     assertEquals(0, classToTest.diff(newActions, newActions).size());
   }
-  
-  @Test
-  public void shouldReturnOneUpdationOfResponseWhenMIMESchemaIsAddedToResponse(){
-    addMapEntryWithResponse(newActions, ActionType.GET, "/test", mockResponseWithAddedMime());
-    assertEquals(1, classToTest.diff(newActions, oldActions).size());
-  }
-  
-  @Test
-  public void shouldReturnOneUpdationOfResponseWhenMIMESchemaIsDeletedFromResponse(){
-    addMapEntryWithResponse(newActions, ActionType.GET, "/test", mockResponseWithDeletedMime());
-    assertEquals(1, classToTest.diff(newActions, oldActions).size());
-  }
-  
-  @Test
-  public void shouldReturnOneUpdationOfResponseWhenMIMESchemaIsUpdatedInResponse(){
-    addMapEntryWithResponse(newActions, ActionType.GET, "/test", mockResponseWithModifiedMimeSchema());
-    assertEquals(1, classToTest.diff(newActions, oldActions).size());
-  }
 }
