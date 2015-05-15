@@ -22,11 +22,9 @@ import diff.ResponseDiff;
 import engine.Finder;
 
 /**
- * The class finds out the Response that are added, deleted or modified.
- * 
- *
+ * The class finds and reports if the response schema has changed
  */
-public class FindActionsWithUpdatedResponses implements Finder {
+public class FindActionsWithUpdatedResponseSchema implements Finder {
 
   private static final String RESPONSE = "Response :";
   private static final String IS_UPDATED_TEXT = " is updated";
@@ -34,12 +32,9 @@ public class FindActionsWithUpdatedResponses implements Finder {
   private static final String IS_ADDED_TEXT = " is added";
   private static final String MIME_TYPE = " - Mime Type - ";
 
-
-
   /**
-   * The method returns the list of ActionDiff objects indicating the following : 1. Response
-   * Objects that are ADDED 2. Response Objects that are DELETED 3. Response Objects whose Schema
-   * has been modified as UPDATED.
+   * The method returns the list of ActionDiff objects indicating the following : Response Objects
+   * whose Schema has been modified as UPDATED.
    * 
    * @param Map<ActionId, Action>
    * @param Map<ActionId, Action>
@@ -57,35 +52,26 @@ public class FindActionsWithUpdatedResponses implements Finder {
                 actionId -> {
 
                   Action commonAction = newActions.get(actionId);
-                  Set<String> newActionResponses = retrieveResponseKeyset(newActions, actionId);
-                  Set<String> oldActionResponses = retrieveResponseKeyset(oldActions, actionId);
 
-                  Collection<String> addedResponseKeySet =
-                      CollectionUtils.subtract(newActionResponses, oldActionResponses);
-                  Collection<String> deletedResponseKeySet =
-                      CollectionUtils.subtract(oldActionResponses, newActionResponses);
+                  Map<String, Response> newResponses = getResponsesForAction(newActions, actionId);
+                  Map<String, Response> oldResponses = getResponsesForAction(oldActions, actionId);
+
+                  Set<String> newResponseStatusCode = newResponses.keySet();
+                  Set<String> oldResponseStatusCode = oldResponses.keySet();
+
                   Collection<String> commonResponseKeySet =
-                      CollectionUtils.intersection(newActionResponses, oldActionResponses);
+                      CollectionUtils.intersection(newResponseStatusCode, oldResponseStatusCode);
 
-                  Map<String, Response> newResponses = retrieveResponses(newActions, actionId);
-                  Map<String, Response> oldResponses = retrieveResponses(oldActions, actionId);
                   Collection<String> modifiedResponse =
                       retrieveResponsesWithModifiedSchema(newResponses, oldResponses, commonResponseKeySet);
 
-                  List<ActionDiff> allDifferences = new ArrayList<ActionDiff>();
-                  if (CollectionUtils.isNotEmpty(addedResponseKeySet)) {
-                    allDifferences.add(new ResponseDiff(DiffType.NEW, commonAction, addedResponseKeySet));
-                  }
-
-                  if (CollectionUtils.isNotEmpty(deletedResponseKeySet)) {
-                    allDifferences.add(new ResponseDiff(DiffType.DELETED, commonAction, deletedResponseKeySet));
-                  }
+                  List<ActionDiff> updatedResponseSchema = new ArrayList<ActionDiff>();
 
                   if (CollectionUtils.isNotEmpty(modifiedResponse)) {
-                    allDifferences.add(new ResponseDiff(DiffType.UPDATED, commonAction, modifiedResponse));
+                    updatedResponseSchema.add(new ResponseDiff(DiffType.UPDATED, commonAction, modifiedResponse));
                   }
 
-                  return allDifferences.stream();
+                  return updatedResponseSchema.stream();
                 }).collect(Collectors.toList());
     return actionsWithDifferentResponseSchemas;
   }
@@ -97,7 +83,7 @@ public class FindActionsWithUpdatedResponses implements Finder {
    * @param ActionId
    * @return Map<String, Response>
    */
-  public Map<String, Response> retrieveResponses(Map<ActionId, Action> actionMap, ActionId actionId) {
+  protected Map<String, Response> getResponsesForAction(Map<ActionId, Action> actionMap, ActionId actionId) {
     return actionMap.get(actionId).getResponses();
   }
 
@@ -110,7 +96,7 @@ public class FindActionsWithUpdatedResponses implements Finder {
    * @param Collection<String>
    * @return Collection<String>
    */
-  private Collection<String> retrieveResponsesWithModifiedSchema(Map<String, Response> newActionResponses,
+  protected Collection<String> retrieveResponsesWithModifiedSchema(Map<String, Response> newActionResponses,
       Map<String, Response> oldActionResponses, Collection<String> commonResponses) {
 
     List<String> changedResponseSchema =
@@ -129,23 +115,24 @@ public class FindActionsWithUpdatedResponses implements Finder {
                   Collection<String> deletedMimeTypes =
                       fetchDifferenceInMimeTypes(oldResponseMimeTypes, newResponseMimeTypes);
 
-                  List<String> allResponseDifferences = new ArrayList<String>();
+                  List<String> allSchemaDifferences = new ArrayList<String>();
 
-                  addMimeTypeDifferenceDetails(allResponseDifferences, responseKey, newlyAddedMimeTypes, IS_ADDED_TEXT);
-                  addMimeTypeDifferenceDetails(allResponseDifferences, responseKey, deletedMimeTypes, IS_DELETED_TEXT);
+                  addMimeTypeDifferenceDetails(allSchemaDifferences, responseKey, newlyAddedMimeTypes, IS_ADDED_TEXT);
+                  addMimeTypeDifferenceDetails(allSchemaDifferences, responseKey, deletedMimeTypes, IS_DELETED_TEXT);
 
 
                   Collection<String> existingMimeTypes =
                       CollectionUtils.intersection(newResponseMimeTypes.keySet(), oldResponseMimeTypes.keySet());
+
                   for (String mimeType : existingMimeTypes) {
                     MimeType newMimeType = newResponseMimeTypes.get(mimeType);
                     MimeType oldMimeType = oldResponseMimeTypes.get(mimeType);
                     if (!StringUtils.equals(newMimeType.getSchema(), oldMimeType.getSchema())) {
-                      addChangedMimeType(allResponseDifferences, responseKey, IS_UPDATED_TEXT, mimeType);
+                      addChangedMimeType(allSchemaDifferences, responseKey, IS_UPDATED_TEXT, mimeType);
                     }
                   }
 
-                  return allResponseDifferences.stream();
+                  return allSchemaDifferences.stream();
                 }).collect(Collectors.toList());
 
     return changedResponseSchema;
@@ -159,7 +146,7 @@ public class FindActionsWithUpdatedResponses implements Finder {
    * @param Collection<String>
    * @param String
    */
-  public void addMimeTypeDifferenceDetails(List<String> changedResponseSchema, String responseKey,
+  protected void addMimeTypeDifferenceDetails(List<String> changedResponseSchema, String responseKey,
       Collection<String> mimeTypesToAdd, String textToBeAdded) {
     for (String mimeType : mimeTypesToAdd) {
       addChangedMimeType(changedResponseSchema, responseKey, textToBeAdded, mimeType);
@@ -167,7 +154,7 @@ public class FindActionsWithUpdatedResponses implements Finder {
   }
 
 
-  public boolean addChangedMimeType(List<String> changedResponseSchema, String responseKey, String textToBeAdded,
+  protected boolean addChangedMimeType(List<String> changedResponseSchema, String responseKey, String textToBeAdded,
       String mimeType) {
     return changedResponseSchema.add(RESPONSE + responseKey + MIME_TYPE + mimeType + textToBeAdded);
   }
@@ -179,7 +166,7 @@ public class FindActionsWithUpdatedResponses implements Finder {
    * @param Response
    * @return Map<String, MimeType>
    */
-  private Map<String, MimeType> retrieveMimeTypeDetails(Response response) {
+  protected Map<String, MimeType> retrieveMimeTypeDetails(Response response) {
     Map<String, MimeType> mimeTypes = response.getBody();
     if (MapUtils.isEmpty(mimeTypes)) {
       return new HashMap<String, MimeType>();
@@ -199,30 +186,20 @@ public class FindActionsWithUpdatedResponses implements Finder {
    * @param Map<String, MimeType> oldResponseMimeTypes
    * @return Collection<String>
    */
-  public Collection<String> fetchDifferenceInMimeTypes(Map<String, MimeType> newResponseMimeTypes,
-      Map<String, MimeType> oldResponseMimeTypes) {
+  protected Collection<String> fetchDifferenceInMimeTypes(Map<String, MimeType> first, Map<String, MimeType> second) {
     Collection<String> differenceMimeTypes = null;
-    Set<String> oldResponseMimeTypeKeyset = oldResponseMimeTypes.keySet();
-    Set<String> newResponseMimeTypeKeySet = newResponseMimeTypes.keySet();
+    Set<String> oldResponseMimeTypeKeyset = second.keySet();
+    Set<String> newResponseMimeTypeKeySet = first.keySet();
     differenceMimeTypes = CollectionUtils.subtract(newResponseMimeTypeKeySet, oldResponseMimeTypeKeyset);
     return differenceMimeTypes;
   }
 
-
   /**
-   * The method returns all the responses associated with a corresponding ActionId
-   * 
-   * @param Map<ActionId, Action>
-   * @param ActionId
-   * @return Set<String>
+   * all instances of this class are equals
    */
-  public Set<String> retrieveResponseKeyset(Map<ActionId, Action> actionMap, ActionId actionId) {
-    return retrieveResponses(actionMap, actionId).keySet();
-  }
-
   public boolean equals(Object o) {
     boolean result = false;
-    if (FindActionsWithUpdatedResponses.class.getName().equals(o.getClass().getName())) {
+    if (FindActionsWithUpdatedResponseSchema.class.getName().equals(o.getClass().getName())) {
       result = true;
     }
 

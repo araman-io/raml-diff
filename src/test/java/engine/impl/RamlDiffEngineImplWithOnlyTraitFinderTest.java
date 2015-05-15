@@ -16,7 +16,6 @@ import org.raml.model.Action;
 import org.raml.model.ActionType;
 import org.raml.model.Resource;
 
-import service.RamlDiffService;
 import diff.ActionDiff;
 import diff.ActionId;
 import diff.ActionParamDiff;
@@ -65,34 +64,29 @@ public class RamlDiffEngineImplWithOnlyTraitFinderTest extends MockHelper {
     assertEquals(0, traitDifferences.size());
   }
   
-//  @Test
-//  public void reportsAdditionOfNewParameterWhenParameterIsAddedToTrait() throws FileNotFoundException{
-//    String oldRamlFilePath = "src/test/resources/complete_raml_with_one_resource_with_trait.raml";
-//    String newRamlFilePath = "src/test/resources/complete_raml_with_one_resource_with_trait_one_parameter_added_to_trait.raml";
-//    RamlDiffService service = new RamlDiffService();
-//    Collection<Resource> oldRamlResources = retrieveResources(oldRamlFilePath);
-//    Map<ActionId, Action> oldActionMap = service.getRamlActionsFor(oldRamlResources);
-//    
-//    Collection<Resource> newRamlResources = retrieveResources(newRamlFilePath);
-//    Map<ActionId, Action> newActionMap = service.getRamlActionsFor(newRamlResources);
-//    
-//    List<ActionDiff> allDifferences = classToTest.findDifferences(newActionMap, oldActionMap);
-//    int countOfTraits = 0;
-//    int countOfParams = 0;
-//    for(ActionDiff difference : allDifferences){
-//      if(difference instanceof ActionParamDiff){
-//        countOfParams+=1;
-//      }else if(difference instanceof TraitDiff){
-//        countOfTraits+=1;
-//      }
-//    }
-//    
-//    assertEquals(1, allDifferences.size());
-//    assertEquals(1, countOfParams);
-//    assertEquals(0, countOfTraits);
-//    
-//    
-//  }
-  
-
+  @Test
+  public void reportsAdditionOfNewParameterWhenParameterIsAddedToTrait() throws FileNotFoundException{
+    String oldRamlFilePath = "src/test/resources/complete_raml_with_one_resource_with_trait.raml";
+    String newRamlFilePath = "src/test/resources/complete_raml_with_one_resource_with_trait_one_parameter_added_to_trait.raml";
+    Collection<Resource> oldRamlResources = retrieveResources(oldRamlFilePath);
+    Map<ActionId, Action> oldActionMap = getRamlActionsFor(oldRamlResources);
+    
+    Collection<Resource> newRamlResources = retrieveResources(newRamlFilePath);
+    Map<ActionId, Action> newActionMap = getRamlActionsFor(newRamlResources);
+    
+    List<ActionDiff> allDifferences = classToTest.findDifferences(newActionMap, oldActionMap);
+    int countOfTraits = 0;
+    int countOfParams = 0;
+    for(ActionDiff difference : allDifferences){
+      if(difference instanceof ActionParamDiff){
+        countOfParams+=1;
+      }else if(difference instanceof TraitDiff){
+        countOfTraits+=1;
+      }
+    }
+    
+    assertEquals(1, allDifferences.size());
+    assertEquals(1, countOfParams);
+    assertEquals(0, countOfTraits);    
+  }
 }

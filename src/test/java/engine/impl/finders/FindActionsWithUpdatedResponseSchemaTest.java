@@ -14,33 +14,16 @@ import org.raml.model.ActionType;
 import diff.ActionId;
 import engine.MockHelper;
 
-public class FindActionsWithUpdatedResponsesTest extends MockHelper {
+public class FindActionsWithUpdatedResponseSchemaTest extends MockHelper {
   
   Map<ActionId, Action> newActions = new HashMap<ActionId, Action>();
   Map<ActionId, Action> oldActions = new HashMap<ActionId, Action>();
-  FindActionsWithUpdatedResponses classToTest = new FindActionsWithUpdatedResponses();
+  FindActionsWithUpdatedResponseSchema classToTest = new FindActionsWithUpdatedResponseSchema();
   
   @Before
   public void init(){
     addMapEntryWithResponse(newActions, ActionType.GET, "/test", mockResponse());
-    addMapEntryWith(oldActions, ActionType.GET, "/test");
-  }
-  
-  
-  @Test
-  public void shouldReturnOneAdditionOfResponseWhenAResponseIsAddedToNewRaml(){
-    assertEquals(1, classToTest.diff(newActions, oldActions).size());
-  }
-  
-  @Test
-  public void shouldReturnOneDeletionOfResponseWhenAResponseIsDeletedFromNewRaml(){
-    assertEquals(1, classToTest.diff(oldActions, newActions).size());
-  }
-  
-  @Test
-  public void shouldReturnNoChanegeInResponseWhenAResponseIsNeitherAddedNorRemoved(){
-    assertEquals(0, classToTest.diff(oldActions, oldActions).size());
-    assertEquals(0, classToTest.diff(newActions, newActions).size());
+    addMapEntryWithResponse(oldActions, ActionType.GET, "/test", mockResponse());
   }
   
   @Test
