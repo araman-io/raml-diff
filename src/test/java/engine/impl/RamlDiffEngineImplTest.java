@@ -20,7 +20,7 @@ import engine.Finder;
 import engine.MockHelper;
 import engine.RamlDiffEngine;
 import engine.impl.finders.FindActionsWithUpdatedQueryParameters;
-import engine.impl.finders.FindActionsWithUpdatedResponses;
+import engine.impl.finders.FindActionsWithUpdatedResponseStatusCode;
 import engine.impl.finders.FindActionsWithUpdatedTraits;
 import engine.impl.finders.FindNewActions;
 import engine.impl.finders.FindRemovedActions;
@@ -30,7 +30,7 @@ public class RamlDiffEngineImplTest extends MockHelper {
   Map<ActionId, Action> newActionMap = new HashMap<ActionId, Action>();
   Map<ActionId, Action> oldActionMap = new HashMap<ActionId, Action>();
   List<Finder> EXPECTED_FINDER_ORDER = Arrays.asList(new FindNewActions(), new FindRemovedActions(),
-      new FindActionsWithUpdatedQueryParameters(), new FindActionsWithUpdatedTraits(), new FindActionsWithUpdatedResponses());
+      new FindActionsWithUpdatedQueryParameters(), new FindActionsWithUpdatedTraits(), new FindActionsWithUpdatedResponseStatusCode());
   private RamlDiffEngine ramlDiffEngine = new RamlDiffEngineImpl();
 
 

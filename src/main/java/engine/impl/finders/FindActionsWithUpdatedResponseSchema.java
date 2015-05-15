@@ -53,8 +53,8 @@ public class FindActionsWithUpdatedResponseSchema implements Finder {
 
                   Action commonAction = newActions.get(actionId);
 
-                  Map<String, Response> newResponses = retrieveResponses(newActions, actionId);
-                  Map<String, Response> oldResponses = retrieveResponses(oldActions, actionId);
+                  Map<String, Response> newResponses = getResponsesForAction(newActions, actionId);
+                  Map<String, Response> oldResponses = getResponsesForAction(oldActions, actionId);
 
                   Set<String> newResponseStatusCode = newResponses.keySet();
                   Set<String> oldResponseStatusCode = oldResponses.keySet();
@@ -83,7 +83,7 @@ public class FindActionsWithUpdatedResponseSchema implements Finder {
    * @param ActionId
    * @return Map<String, Response>
    */
-  protected Map<String, Response> retrieveResponses(Map<ActionId, Action> actionMap, ActionId actionId) {
+  protected Map<String, Response> getResponsesForAction(Map<ActionId, Action> actionMap, ActionId actionId) {
     return actionMap.get(actionId).getResponses();
   }
 
@@ -117,10 +117,8 @@ public class FindActionsWithUpdatedResponseSchema implements Finder {
 
                   List<String> allSchemaDifferences = new ArrayList<String>();
 
-                  addMimeTypeDifferenceDetails(allSchemaDifferences, responseKey, newlyAddedMimeTypes,
-                      IS_ADDED_TEXT);
-                  addMimeTypeDifferenceDetails(allSchemaDifferences, responseKey, deletedMimeTypes,
-                      IS_DELETED_TEXT);
+                  addMimeTypeDifferenceDetails(allSchemaDifferences, responseKey, newlyAddedMimeTypes, IS_ADDED_TEXT);
+                  addMimeTypeDifferenceDetails(allSchemaDifferences, responseKey, deletedMimeTypes, IS_DELETED_TEXT);
 
 
                   Collection<String> existingMimeTypes =
@@ -188,11 +186,10 @@ public class FindActionsWithUpdatedResponseSchema implements Finder {
    * @param Map<String, MimeType> oldResponseMimeTypes
    * @return Collection<String>
    */
-  protected Collection<String> fetchDifferenceInMimeTypes(Map<String, MimeType> newResponseMimeTypes,
-      Map<String, MimeType> oldResponseMimeTypes) {
+  protected Collection<String> fetchDifferenceInMimeTypes(Map<String, MimeType> first, Map<String, MimeType> second) {
     Collection<String> differenceMimeTypes = null;
-    Set<String> oldResponseMimeTypeKeyset = oldResponseMimeTypes.keySet();
-    Set<String> newResponseMimeTypeKeySet = newResponseMimeTypes.keySet();
+    Set<String> oldResponseMimeTypeKeyset = second.keySet();
+    Set<String> newResponseMimeTypeKeySet = first.keySet();
     differenceMimeTypes = CollectionUtils.subtract(newResponseMimeTypeKeySet, oldResponseMimeTypeKeyset);
     return differenceMimeTypes;
   }
