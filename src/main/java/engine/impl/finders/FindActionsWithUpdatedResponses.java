@@ -17,54 +17,44 @@ import diff.ResponseDiff;
 import engine.Finder;
 
 /**
- * The class finds out the Response that are added and/or deleted.
- * 
- *
+ * The class finds out the Responses which were added and/or deleted from an action by comparing the
+ * status code.
  */
 public class FindActionsWithUpdatedResponses implements Finder {
 
   /**
-   * The method returns the list of ActionDiff objects indicating the following : 
-   * 1. Response Objects that are ADDED 
-   * 2. Response Objects that are DELETED
-   * 
+   * The method returns the list of ActionDiff objects indicating the following : 1. Response
+   * Objects that are ADDED 2. Response Objects that are DELETED
    * 
    * @param Map<ActionId, Action>
    * @param Map<ActionId, Action>
    * @return List<ActionDiff>
-   * 
    */
   @Override
   public List<ActionDiff> diff(Map<ActionId, Action> newActions, Map<ActionId, Action> oldActions) {
-    List<ActionDiff> actionsWithDifferentResponseSchemas = null;
+    List<ActionDiff> actionsWithDifferingResponses = null;
     Collection<ActionId> commonActions = CollectionUtils.intersection(newActions.keySet(), oldActions.keySet());
-    actionsWithDifferentResponseSchemas =
-        commonActions
-            .stream()
-            .flatMap(
-                actionId -> {
+    actionsWithDifferingResponses = commonActions.stream().flatMap(actionId -> {
 
-                  Action commonAction = newActions.get(actionId);
-                  Set<String> newActionResponses = retrieveResponseKeyset(newActions, actionId);
-                  Set<String> oldActionResponses = retrieveResponseKeyset(oldActions, actionId);
+      Action commonAction = newActions.get(actionId);
+      Set<String> newActionResponses = retrieveResponseKeyset(newActions, actionId);
+      Set<String> oldActionResponses = retrieveResponseKeyset(oldActions, actionId);
 
-                  Collection<String> addedResponseKeySet =
-                      CollectionUtils.subtract(newActionResponses, oldActionResponses);
-                  Collection<String> deletedResponseKeySet =
-                      CollectionUtils.subtract(oldActionResponses, newActionResponses);
+      Collection<String> addedResponseKeySet = CollectionUtils.subtract(newActionResponses, oldActionResponses);
+      Collection<String> deletedResponseKeySet = CollectionUtils.subtract(oldActionResponses, newActionResponses);
 
-                  List<ActionDiff> allDifferences = new ArrayList<ActionDiff>();
-                  if (CollectionUtils.isNotEmpty(addedResponseKeySet)) {
-                    allDifferences.add(new ResponseDiff(DiffType.NEW, commonAction, addedResponseKeySet));
-                  }
+      List<ActionDiff> allDifferences = new ArrayList<ActionDiff>();
+      if (CollectionUtils.isNotEmpty(addedResponseKeySet)) {
+        allDifferences.add(new ResponseDiff(DiffType.NEW, commonAction, addedResponseKeySet));
+      }
 
-                  if (CollectionUtils.isNotEmpty(deletedResponseKeySet)) {
-                    allDifferences.add(new ResponseDiff(DiffType.DELETED, commonAction, deletedResponseKeySet));
-                  }
+      if (CollectionUtils.isNotEmpty(deletedResponseKeySet)) {
+        allDifferences.add(new ResponseDiff(DiffType.DELETED, commonAction, deletedResponseKeySet));
+      }
 
-                  return allDifferences.stream();
-                }).collect(Collectors.toList());
-    return actionsWithDifferentResponseSchemas;
+      return allDifferences.stream();
+    }).collect(Collectors.toList());
+    return actionsWithDifferingResponses;
   }
 
   /**
@@ -74,16 +64,19 @@ public class FindActionsWithUpdatedResponses implements Finder {
    * @param ActionId
    * @return Set<String>
    */
-  public Set<String> retrieveResponseKeyset(Map<ActionId, Action> actionMap, ActionId actionId) {
+  protected Set<String> retrieveResponseKeyset(Map<ActionId, Action> actionMap, ActionId actionId) {
     return actionMap.get(actionId).getResponses().keySet();
   }
 
+  /**
+   * all instances of this class are equal
+   */
   public boolean equals(Object o) {
     boolean result = false;
     if (FindActionsWithUpdatedResponses.class.getName().equals(o.getClass().getName())) {
       result = true;
     }
-
     return result;
   }
+
 }
