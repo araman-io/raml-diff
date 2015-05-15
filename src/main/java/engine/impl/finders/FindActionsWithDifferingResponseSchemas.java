@@ -29,45 +29,47 @@ public class FindActionsWithDifferingResponseSchemas implements Finder {
     Collection<ActionId> commonActionIds = this.getCommonActions(newActions, oldActions);
     List<ActionDiff> differences = null;
 
-    differences =
-        commonActionIds
-            .stream()
-            .map(
-                actionId -> {
-                  Action action = newActions.get(actionId);
-                  Map<String, Response> newResponseMap = this.getResponseMapForAction(newActions, actionId);
-                  Map<String, Response> oldResponseMap = this.getResponseMapForAction(oldActions, actionId);
-
-                  Collection<String> commonStatusCodes =
-                      CollectionUtils.intersection(newResponseMap.keySet(), oldResponseMap.keySet());
-
-                  return new FindSchemaDiffContext(commonStatusCodes, newResponseMap, oldResponseMap, action, actionId);
-                })
-            .flatMap(
-                context -> {
-                  List<CollateSchemaDiffContext> allSchemaDifferences =
-                      context.ids
-                          .stream()
-                          .map(
-                              statusCode -> {
-                                Set<String> schemasFromNewResponse =
-                                    this.getCollatedSchemaForResponseWithStatusCode(statusCode, context.newResponseMap);
-                                Set<String> schemasFromOldResponse =
-                                    this.getCollatedSchemaForResponseWithStatusCode(statusCode, context.oldResponseMap);
-                                Collection<String> schemaDifferences =
-                                    CollectionUtils.subtract(schemasFromNewResponse, schemasFromOldResponse);
-
-                                return new CollateSchemaDiffContext(schemaDifferences, schemasFromNewResponse,
-                                    schemasFromOldResponse, context.action, context.actionId);
-                              }).collect(Collectors.toList());
-
-                  return allSchemaDifferences.stream();
-                })
-            .map(schemaDiffContext -> {
-              return new SchemaDiff(DiffType.UPDATED, schemaDiffContext.action, schemaDiffContext.schemaDifferences);
+    //@formatter:off
+    differences = 
+      commonActionIds
+        .stream()
+        .map( actionId -> {
+            Action action = newActions.get(actionId);
+            Map<String, Response> newResponseMap = this.getResponseMapForAction(newActions, actionId);
+            Map<String, Response> oldResponseMap = this.getResponseMapForAction(oldActions, actionId);
+            
+            Collection<String> commonStatusCodes = CollectionUtils.intersection(newResponseMap.keySet(), oldResponseMap.keySet());
+            
+            return new CommonStatusCodeContext(commonStatusCodes, newResponseMap, oldResponseMap, action, actionId);
+        })
+        .flatMap(context -> {
+          List<SchemaDifferenceContext> allDifferences;
+          allDifferences = 
+            context.ids
+              .stream()
+              .map(statusCode -> {
+                SchemaDifferenceContext schemaDifferenceContext = null;
+                Set<String> schemaFromNewResponse = this.getCollatedSchemaForResponseWithStatusCode(statusCode, context.newResponseMap);
+                Set<String> schemaFromOldResponse = this.getCollatedSchemaForResponseWithStatusCode(statusCode, context.oldResponseMap);
+                Collection<String> schemaDifferences = CollectionUtils.subtract(schemaFromNewResponse, schemaFromOldResponse);
+                
+                if ( CollectionUtils.isNotEmpty(schemaDifferences) ) {
+                    schemaDifferenceContext = new SchemaDifferenceContext(schemaDifferences, statusCode, context.action, context.actionId);
+                } 
+                return schemaDifferenceContext;
               })
-            .collect(Collectors.toList());
-    
+              .filter( o -> isNotNull(o))
+              .collect(Collectors.toList());
+          
+          return allDifferences.stream();
+        })
+        .map(schemaContext -> {
+          return new SchemaDiff(DiffType.UPDATED, schemaContext.action, schemaContext.schemaDifferences, schemaContext.statusCode);
+        })
+        .collect(Collectors.toList());
+      //@formatter:on
+
+
     return differences; // return method block
   }
 
@@ -76,9 +78,14 @@ public class FindActionsWithDifferingResponseSchemas implements Finder {
     Set<String> collatedSchemas = new HashSet<String>();
 
     if (isNotNull(r.getBody()) && isNotNull(r.getBody().values())) {
-      collatedSchemas = r.getBody().values().stream().map(mimeType -> {
-        return mimeType.getSchema();
-      }).collect(Collectors.toSet());
+      //@formatter:off
+      collatedSchemas = 
+          r.getBody().values()
+            .stream()
+            .filter(mimeType -> isNotNull(mimeType.getSchema()))
+            .map(mimeType -> {return mimeType.getSchema();})
+            .collect(Collectors.toSet());
+      //@formatter:on
     }
 
     return collatedSchemas;
@@ -112,8 +119,15 @@ public class FindActionsWithDifferingResponseSchemas implements Finder {
 }
 
 
-class FindSchemaDiffContext {
-  public FindSchemaDiffContext(Collection<String> ids, Map<String, Response> newResponseMap,
+class CommonStatusCodeContext {
+
+  Collection<String> ids;
+  Map<String, Response> newResponseMap;
+  Map<String, Response> oldResponseMap;
+  Action action;
+  ActionId actionId;
+
+  public CommonStatusCodeContext(Collection<String> ids, Map<String, Response> newResponseMap,
       Map<String, Response> oldResponseMap, Action action, ActionId actionId) {
     super();
     this.ids = ids;
@@ -122,28 +136,20 @@ class FindSchemaDiffContext {
     this.action = action;
     this.actionId = actionId;
   }
-
-  Collection<String> ids;
-  Map<String, Response> newResponseMap;
-  Map<String, Response> oldResponseMap;
-  Action action;
-  ActionId actionId;
 }
 
 
-class CollateSchemaDiffContext {
+class SchemaDifferenceContext {
 
   Collection<String> schemaDifferences;
-  Set<String> schemaFromNewResponse;
-  Set<String> schemaFromOldResponse;
+  String statusCode;
   Action action;
   ActionId actionId;
 
-  public CollateSchemaDiffContext(Collection<String> schemaDifferences, Set<String> schemaFromNewResponse,
-      Set<String> schemasFromOldResponse, Action action, ActionId actionId) {
+  public SchemaDifferenceContext(Collection<String> schemaDifferences, String statusCode, Action action,
+      ActionId actionId) {
     this.schemaDifferences = schemaDifferences;
-    this.schemaFromNewResponse = schemaFromNewResponse;
-    this.schemaFromOldResponse = schemasFromOldResponse;
+    this.statusCode = statusCode;
     this.action = action;
     this.actionId = actionId;
   }

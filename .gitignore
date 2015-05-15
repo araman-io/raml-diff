@@ -1,4 +1,5 @@
 .gradle/
+.settings/
 build/
 bin/
 *.swp
