@@ -26,12 +26,17 @@ public class RamlDiffEngineImpl implements RamlDiffEngine {
 
   public List<ActionDiff> findDifferences(Map<ActionId, Action> newActions, Map<ActionId, Action> oldActions) {
 
-    List<ActionDiff> allDifferences = finders.stream().parallel().flatMap(finder -> {
-      return finder.diff(newActions, oldActions).stream();
-    }).collect(Collectors.toList());
+    //@formatter:off
+    List<ActionDiff> allDifferences = 
+        finders
+          .stream()
+          .flatMap(finder -> {
+              return finder.diff(newActions, oldActions).stream();
+          })
+          .collect(Collectors.toList());
+    //@formatter:on
 
     return allDifferences;
-
   }
 
   @Override

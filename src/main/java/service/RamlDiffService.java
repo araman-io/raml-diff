@@ -45,8 +45,7 @@ public class RamlDiffService {
 
   protected Collection<Resource> getRamlResourcesFor(String fileName) throws Exception {
     FileReader fileReader = new FileReader(new File(fileName));
-    @SuppressWarnings("deprecation")
-	Raml document = new RamlDocumentBuilder().build(fileReader);
+    Raml document = new RamlDocumentBuilder().build(fileReader);
     Collection<Resource> allResources = this.flattenResources(document.getResources().values());
     return allResources;
   }
@@ -62,24 +61,21 @@ public class RamlDiffService {
     return nested;
   }
 
-  /*public static void main(String[] args) throws Exception {
-    new RamlDiffService().diff(
-        "src/test/resources/04-bookservice-addqueryparam.raml",   
-        "src/test/resources/01-bookservice.raml");
-  }*/
-  
+  /*
+   * public static void main(String[] args) throws Exception { new RamlDiffService().diff(
+   * "src/test/resources/04-bookservice-addqueryparam.raml",
+   * "src/test/resources/01-bookservice.raml"); }
+   */
+
   public static void main(String[] args) throws Exception {
-	    new RamlDiffService().diff(	"src/test/resources/complete_raml.raml",    	
-	    	"src/test/resources/complete_raml_all_historical_trait_removed.raml"
-	        );
-	  }
+    new RamlDiffService().diff("src/test/resources/github.raml", "src/test/resources/github-api-v3.raml");
+  }
 
 }
 
 /*
-"src/test/resources/05-bookservice-addbaseuriparam.raml",
-"src/test/resources/04-bookservice-addqueryparam.raml",
-"src/test/resources/03-bookservice-removedqueryparam.raml",
-"src/test/resources/02-bookservice-newaction.raml",          
-"src/test/resources/01-bookservice.raml"
-*/
+ * "src/test/resources/05-bookservice-addbaseuriparam.raml",
+ * "src/test/resources/04-bookservice-addqueryparam.raml",
+ * "src/test/resources/03-bookservice-removedqueryparam.raml",
+ * "src/test/resources/02-bookservice-newaction.raml", "src/test/resources/01-bookservice.raml"
+ */
