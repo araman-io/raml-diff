@@ -32,14 +32,9 @@ public class RamlDiffService {
   RamlDiffEngine diffEngine = new RamlDiffEngineImpl();
 
   public List<ActionDiff> diff(String later, String older) throws Exception {
-    Collection<Resource> laterResources = null;
-    Collection<Resource> olderResources = null;
-    try{
-    laterResources = getRamlResourcesFor(later);
-    olderResources = getRamlResourcesFor(older);
-    }catch(Exception e){
-      e.printStackTrace();
-    }
+    Collection<Resource> laterResources = getRamlResourcesFor(later);
+    Collection<Resource> olderResources = getRamlResourcesFor(older);
+
     
     Map<ActionId, Action> mapOfNewActions = getRamlActionsFor(laterResources);
     Map<ActionId, Action> mapOfOldActions = getRamlActionsFor(olderResources);
