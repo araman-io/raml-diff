@@ -21,7 +21,6 @@ import engine.MockHelper;
 import engine.RamlDiffEngine;
 import engine.impl.finders.FindActionsWithDifferingResponseSchemas;
 import engine.impl.finders.FindActionsWithUpdatedQueryParameters;
-import engine.impl.finders.FindActionsWithUpdatedResponseSchema;
 import engine.impl.finders.FindActionsWithUpdatedResponseStatusCode;
 import engine.impl.finders.FindActionsWithUpdatedTraits;
 import engine.impl.finders.FindNewActions;
