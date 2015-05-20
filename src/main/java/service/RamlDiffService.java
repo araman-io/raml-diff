@@ -1,5 +1,7 @@
 package service;
 
+import static spark.Spark.get;
+
 import java.io.File;
 import java.io.FileReader;
 import java.net.URL;
@@ -9,16 +11,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static spark.Spark.*;
-
 import org.raml.model.Action;
 import org.raml.model.Raml;
 import org.raml.model.Resource;
 import org.raml.parser.visitor.RamlDocumentBuilder;
 
-import beans.RamlDiffServiceRequest;
-import beans.RamlDiffServiceResponse;
-import utility.JsonUtility;
 import diff.ActionDiff;
 import diff.ActionId;
 import engine.RamlDiffEngine;
@@ -83,29 +80,25 @@ public class RamlDiffService {
   }
 */
   
-  public static void main(String[] args) throws Exception {
+  public static void main(String[] args) {
     get(RAML_DIFF_SERVICE, (request, response) -> { 
         return RAML_DIFF_SERVICE_AVAILABLE_TEXT;    
     });
-    post(FIND_ALL_DIFFERENCES_CONTEXT, (request, response) -> {
-      String diffRequestAsJson = request.body();
-      RamlDiffServiceRequest requestObj = JsonUtility.toRequestObject(diffRequestAsJson);
-      String oldRamlFilePath = requestObj.getOldRamlFileURL();
-      String newRamlFilePath = requestObj.getNewRamlFileURL();
+    get(FIND_ALL_DIFFERENCES_CONTEXT, (request, response) -> {
+     
+      List<ActionDiff> allDifferences = null;
+      String oldRamlFilePath = request.headers("oldRamlFileURL");
+      String newRamlFilePath = request.headers("newRamlFileURL");      
       
       URL oldFileUrl = new URL(oldRamlFilePath);
       URL newFileUrl = new URL(newRamlFilePath);
-      
-      List<ActionDiff> allDifferences = new RamlDiffService().diff(newFileUrl.getFile(), oldFileUrl.getFile());
-      
-      RamlDiffServiceResponse responseObj = new RamlDiffServiceResponse();
-      responseObj.setRamlFileDifferences(allDifferences.stream().flatMap(eachDiff -> {
-      List<String> differenceDetails = new ArrayList<String>();
-        differenceDetails.add(eachDiff.toString());
-        return differenceDetails.stream();
-      }).collect(Collectors.toList()));
-      return responseObj;      
-    }, JsonUtility.json());    
+      try{
+      allDifferences = new RamlDiffService().diff(newFileUrl.getFile(), oldFileUrl.getFile());
+      }catch(Exception e){
+        e.printStackTrace();
+      }
+      return allDifferences;
+    });    
   }
 }
 
