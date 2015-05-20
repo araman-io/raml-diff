@@ -23,9 +23,6 @@ import engine.impl.RamlDiffEngineImpl;
 
 public class RamlDiffService {
 
-  private static final String RAML_DIFF_SERVICE_AVAILABLE_TEXT = "Raml Diff Service is up and running";
-  private static final String FIND_ALL_DIFFERENCES_CONTEXT = "/findAllDifferences";
-
   RamlDiffEngine diffEngine = new RamlDiffEngineImpl();
 
   public List<ActionDiff> diff(String later, String older) throws Exception {
