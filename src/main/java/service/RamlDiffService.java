@@ -24,9 +24,8 @@ import engine.impl.RamlDiffEngineImpl;
 public class RamlDiffService {
 
   private static final String RAML_DIFF_SERVICE_AVAILABLE_TEXT = "Raml Diff Service is up and running";
-  private static final String RAML_DIFF_SERVICE = "/ramlDiffService";
   private static final String FIND_ALL_DIFFERENCES_CONTEXT = "/findAllDifferences";
-  
+
   RamlDiffEngine diffEngine = new RamlDiffEngineImpl();
 
   public List<ActionDiff> diff(String later, String older) throws Exception {
@@ -70,43 +69,22 @@ public class RamlDiffService {
     return nested;
   }
 
-  /*
-   * public static void main(String[] args) throws Exception { new RamlDiffService().diff(
-   * "src/test/resources/04-bookservice-addqueryparam.raml",
-   * "src/test/resources/01-bookservice.raml"); }
-   */
-
-  /*
-   * public static void main(String[] args) throws Exception { new
-   * RamlDiffService().diff("src/test/resources/github.raml",
-   * "src/test/resources/github-api-v3.raml"); }
-   */
-
   public static void main(String[] args) {
-    get(RAML_DIFF_SERVICE, (request, response) -> {
-      return RAML_DIFF_SERVICE_AVAILABLE_TEXT;
+    get("/", (request, response) -> {
+      return "RAML diff service is available. \n" + "/findDiff?v1=<<fileURL>>&v2=<<fileURL>>";
     });
-    get(FIND_ALL_DIFFERENCES_CONTEXT, (request, response) -> {
+
+    get("/findDiff", (request, response) -> {
 
       List<ActionDiff> allDifferences = null;
-      String oldRamlFilePath = request.queryParams("oldRamlFileURL");
-      String newRamlFilePath = request.queryParams("newRamlFileURL");
+      String oldRamlFilePath = request.queryParams("v1");
+      String newRamlFilePath = request.queryParams("v2");
 
       URL oldFileUrl = new URL(oldRamlFilePath);
       URL newFileUrl = new URL(newRamlFilePath);
-      try {
-        allDifferences = new RamlDiffService().diff(newFileUrl.getFile(), oldFileUrl.getFile());
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
+      allDifferences = new RamlDiffService().diff(newFileUrl.getFile(), oldFileUrl.getFile());
+
       return allDifferences;
     });
   }
 }
-
-/*
- * "src/test/resources/05-bookservice-addbaseuriparam.raml",
- * "src/test/resources/04-bookservice-addqueryparam.raml",
- * "src/test/resources/03-bookservice-removedqueryparam.raml",
- * "src/test/resources/02-bookservice-newaction.raml", "src/test/resources/01-bookservice.raml"
- */
