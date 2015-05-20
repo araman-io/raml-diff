@@ -26,13 +26,14 @@ public class RamlDiffService {
   private static final String RAML_DIFF_SERVICE_AVAILABLE_TEXT = "Raml Diff Service is up and running";
   private static final String RAML_DIFF_SERVICE = "/ramlDiffService";
   private static final String FIND_ALL_DIFFERENCES_CONTEXT = "/findAllDifferences";
+  
   RamlDiffEngine diffEngine = new RamlDiffEngineImpl();
 
   public List<ActionDiff> diff(String later, String older) throws Exception {
     Collection<Resource> laterResources = getRamlResourcesFor(later);
     Collection<Resource> olderResources = getRamlResourcesFor(older);
 
-    
+
     Map<ActionId, Action> mapOfNewActions = getRamlActionsFor(laterResources);
     Map<ActionId, Action> mapOfOldActions = getRamlActionsFor(olderResources);
     List<ActionDiff> allDifferences = diffEngine.findDifferences(mapOfNewActions, mapOfOldActions);
@@ -40,7 +41,7 @@ public class RamlDiffService {
     allDifferences.forEach(diff -> {
       System.out.println(diff.toString());
     });
-    
+
     return allDifferences;
   }
 
@@ -75,30 +76,31 @@ public class RamlDiffService {
    * "src/test/resources/01-bookservice.raml"); }
    */
 
-/*  public static void main(String[] args) throws Exception {
-    new RamlDiffService().diff("src/test/resources/github.raml", "src/test/resources/github-api-v3.raml");
-  }
-*/
-  
+  /*
+   * public static void main(String[] args) throws Exception { new
+   * RamlDiffService().diff("src/test/resources/github.raml",
+   * "src/test/resources/github-api-v3.raml"); }
+   */
+
   public static void main(String[] args) {
-    get(RAML_DIFF_SERVICE, (request, response) -> { 
-        return RAML_DIFF_SERVICE_AVAILABLE_TEXT;    
+    get(RAML_DIFF_SERVICE, (request, response) -> {
+      return RAML_DIFF_SERVICE_AVAILABLE_TEXT;
     });
     get(FIND_ALL_DIFFERENCES_CONTEXT, (request, response) -> {
-     
+
       List<ActionDiff> allDifferences = null;
-      String oldRamlFilePath = request.headers("oldRamlFileURL");
-      String newRamlFilePath = request.headers("newRamlFileURL");      
-      
+      String oldRamlFilePath = request.queryParams("oldRamlFileURL");
+      String newRamlFilePath = request.queryParams("newRamlFileURL");
+
       URL oldFileUrl = new URL(oldRamlFilePath);
       URL newFileUrl = new URL(newRamlFilePath);
-      try{
-      allDifferences = new RamlDiffService().diff(newFileUrl.getFile(), oldFileUrl.getFile());
-      }catch(Exception e){
+      try {
+        allDifferences = new RamlDiffService().diff(newFileUrl.getFile(), oldFileUrl.getFile());
+      } catch (Exception e) {
         e.printStackTrace();
       }
       return allDifferences;
-    });    
+    });
   }
 }
 
