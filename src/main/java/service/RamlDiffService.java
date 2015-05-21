@@ -16,6 +16,8 @@ import org.raml.model.Raml;
 import org.raml.model.Resource;
 import org.raml.parser.visitor.RamlDocumentBuilder;
 
+import com.google.gson.Gson;
+
 import diff.ActionDiff;
 import diff.ActionId;
 import engine.RamlDiffEngine;
@@ -24,6 +26,7 @@ import engine.impl.RamlDiffEngineImpl;
 public class RamlDiffService {
 
   RamlDiffEngine diffEngine = new RamlDiffEngineImpl();
+  public static RamlDiffService SERVICE_INSTANCE = new RamlDiffService();
 
   public List<ActionDiff> diff(String later, String older) throws Exception {
     Collection<Resource> laterResources = getRamlResourcesFor(later);
@@ -79,9 +82,18 @@ public class RamlDiffService {
 
       URL oldFileUrl = new URL(oldRamlFilePath);
       URL newFileUrl = new URL(newRamlFilePath);
-      allDifferences = new RamlDiffService().diff(newFileUrl.getFile(), oldFileUrl.getFile());
+      allDifferences = SERVICE_INSTANCE.diff(newFileUrl.getFile(), oldFileUrl.getFile());
 
-      return allDifferences;
+      Gson gson = new Gson();
+
+      //@formatter:off
+      String collect = 
+          allDifferences.stream()
+          .map(d -> gson.toJson(d.getState()))
+          .collect(Collectors.joining(",", "[", "]"));
+      //@formatter:on
+
+      return collect;
     });
   }
 }

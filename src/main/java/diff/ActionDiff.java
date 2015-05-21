@@ -1,6 +1,11 @@
 package diff;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.raml.model.Action;
+
+import com.sun.org.apache.bcel.internal.generic.NEWARRAY;
 
 
 public class ActionDiff {
@@ -20,6 +25,14 @@ public class ActionDiff {
 
   public Action getAction() {
     return action;
+  }
+  
+  public Map<String, Object> getState() {
+    Map<String, Object> state = new HashMap<String, Object>();
+    state.put("DiffType", diffType);
+    state.put("action", new ActionId(action));
+    
+    return state;
   }
   
   @Override
