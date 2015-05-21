@@ -5,9 +5,6 @@ import java.util.Map;
 
 import org.raml.model.Action;
 
-import com.sun.org.apache.bcel.internal.generic.NEWARRAY;
-
-
 public class ActionDiff {
 
   DiffType diffType;
