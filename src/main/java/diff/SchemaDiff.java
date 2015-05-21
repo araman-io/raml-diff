@@ -1,6 +1,7 @@
 package diff;
 
 import java.util.Collection;
+import java.util.Map;
 
 import org.raml.model.Action;
 
@@ -19,6 +20,14 @@ public class SchemaDiff extends ActionDiff {
   public String toString() {
     return "SchemaDiff [schemaDifferences=" + schemaDifferences + ", statusCode=" + statusCode + ", diffType="
         + diffType + ", action=" + action + "]";
+  }
+  
+  @Override
+  public Map<String, Object> getState() {
+    Map<String, Object> state = super.getState();
+    state.put("schemaDifferences", schemaDifferences);
+    state.put("statusCode", statusCode);
+    return state;
   }
 
 }

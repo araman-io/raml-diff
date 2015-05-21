@@ -1,11 +1,16 @@
 package diff;
 
+import org.raml.model.Action;
 import org.raml.model.ActionType;
 
 public class ActionId {
 
   private ActionType type;
   private String resourceUri;
+
+  public ActionId(Action action) {
+    this(action.getType(), action.getResource().getUri());
+  }
 
   public ActionId(ActionType type, String relativeUri) {
     this.type = type;
@@ -44,7 +49,5 @@ public class ActionId {
   public String toString() {
     return "ActionId [type=" + type + ", resourceUri=" + resourceUri + "]";
   }
-  
-  
 
 }
