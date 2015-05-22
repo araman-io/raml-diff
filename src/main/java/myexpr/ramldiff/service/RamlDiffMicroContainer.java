@@ -10,14 +10,14 @@ import myexpr.ramldiff.diff.ActionDiff;
 
 import com.google.gson.Gson;
 
-public class SparkMicroContainer {
+public class RamlDiffMicroContainer {
   
   public static final RamlDiffService SERVICE_INSTANCE = new RamlDiffService();
 
   public static void main(String[] args) {
 
     get("/", (request, response) -> {
-      return "RAML diff service is available. \n" + "/findDiff?v1=<<fileURL>>&v2=<<fileURL>>";
+      return "RAML diff service is available. \n" + "/findDiff?new=<<fileURL>>&old=<<fileURL>>";
     });
 
     get("/findDiff", (request, response) -> {
@@ -37,9 +37,9 @@ public class SparkMicroContainer {
           allDifferences.stream()
           .map(d -> gson.toJson(d.getState()))
           .collect(Collectors.joining(",", "[", "]"));
-      //@formatter:on
 
       return toJson;
     });
+    //@formatter:on
   }
 }
