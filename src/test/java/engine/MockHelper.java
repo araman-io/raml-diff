@@ -24,7 +24,6 @@ import org.raml.model.Resource;
 import org.raml.model.Response;
 import org.raml.parser.visitor.RamlDocumentBuilder;
 
-import service.ActionIdService;
 import diff.ActionDiff;
 import diff.ActionId;
 import diff.DiffType;
@@ -122,9 +121,16 @@ public class MockHelper {
   }
 
   protected Map<ActionId, Action> getRamlActionsFor(Collection<Resource> resources) {
-    return resources.stream().flatMap(resource -> {
-      return resource.getActions().values().stream();
-    }).collect(Collectors.toMap(ActionIdService::getId, ActionIdService::getAction));
+    //@formatter:off
+    return resources.stream()
+        .flatMap(resource -> {
+            return resource.getActions().values().stream();
+        })
+        .collect(Collectors.toMap(
+            a -> new ActionId(a), 
+            a -> a
+        ));
+    //@formatter:on
   }
 
   // Methods for Mocking Actions With Response

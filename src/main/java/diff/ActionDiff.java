@@ -26,7 +26,8 @@ public class ActionDiff {
   
   public Map<String, Object> getState() {
     Map<String, Object> state = new HashMap<String, Object>();
-    state.put("DiffType", diffType);
+    state.put("finderClass", this.getClass().getName());
+    state.put("diffType", diffType);
     state.put("action", new ActionId(action));
     
     return state;

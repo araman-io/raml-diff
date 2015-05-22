@@ -10,7 +10,7 @@ import com.google.gson.Gson;
 
 import diff.ActionDiff;
 
-public class SparkContainer {
+public class SparkMicroContainer {
   
   public static final RamlDiffService SERVICE_INSTANCE = new RamlDiffService();
 

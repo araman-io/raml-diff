@@ -37,7 +37,7 @@ public class RamlDiffService {
   protected Map<ActionId, Action> getRamlActionsFor(Collection<Resource> resources) {
     return resources.stream().flatMap(resource -> {
       return resource.getActions().values().stream();
-    }).collect(Collectors.toMap(ActionIdService::getId, ActionIdService::getAction));
+    }).collect(Collectors.toMap(a -> new ActionId(a), a -> a));
   }
 
   protected Collection<Resource> getRamlResourcesFor(String fileName) throws Exception {
