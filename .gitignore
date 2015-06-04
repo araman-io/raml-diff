@@ -1,10 +1,12 @@
 .classpath
 .project
+.idea/
 .gradle/
 .settings/
 build/
 bin/
 *.swp
+*.iml
 
 # Ignore Gradle GUI config
 gradle-app.setting
